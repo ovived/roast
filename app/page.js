@@ -25,6 +25,8 @@ export default function Component() {
   const [iconPosition, setIconPosition] = useState("center");
   const [transcript, setTranscript] = useState("Stand-up bit transcript...");
   const [messages, setMessages] = useState([]); // Add this line
+  const [lastMessage, setLastMessage] = useState(null);
+
   const requestInProgress = useRef(false);
   const intervalId = useRef(null); // Use a ref to store the interval ID
 
@@ -57,6 +59,11 @@ export default function Component() {
       const data = await response.json();
       const newMessage = data.choices[0].message;
       setMessages((prevMessages) => [...prevMessages, newMessage]);
+    
+     // Set the last message
+  setLastMessage(newMessage);
+
+
       requestInProgress.current = false;
     };
 
@@ -210,9 +217,6 @@ export default function Component() {
         </Button>
       </div>
       <div className="w-full max-w-[500px] flex flex-col gap-6">
-        <audio className="w-full" controls>
-          <source src="/placeholder.mp3" type="audio/mpeg" />
-        </audio>
         <div className="transcript-container bg-zinc-100 p-4 rounded-lg dark:bg-zinc-800">
           <h2 className="transcript-text font-semibold text-lg">Transcript</h2>
           {messages.map((message, index) => (
@@ -221,12 +225,21 @@ export default function Component() {
             </p>
           ))}
         </div>
-        {messages.length > 0 && messages[messages.length - 1].content && (
+    {lastMessage && (
   <AudioStream 
-    text={messages[messages.length - 1].content}
-    voiceId="pNInz6obpgDQGcFmaJgB" 
+    text={lastMessage.content} // Pass only the content field
+    //voiceId="VvKvKZT8rAxSK8JXr82H"  //
+    //voiceId="5gHW1pGud79c5TYEDR1t" // Oz
+    voiceId="EBq0KZkJHDX0jtjAWHNd" // Ramsay
+   // voiceId="xSCThJIHqqZtl3r8Wu4u" //Dave 
     apiKey="b10577501065a2cddfb46fb4bd2b0e67" 
-    voiceSettings={{ stability: 0, similarity_boost: 0 }} 
+    modelId="eleven_multilingual_v2"
+            voiceSettings={{
+              stability: 0.4,
+              similarity_boost: 0.85,
+              style: 0,
+              use_speaker_boost: true
+            }}
   />
 )}
       </div>
